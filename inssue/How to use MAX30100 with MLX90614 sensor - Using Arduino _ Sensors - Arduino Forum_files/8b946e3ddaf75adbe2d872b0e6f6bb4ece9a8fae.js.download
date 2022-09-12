@@ -1,0 +1,63 @@
+if ('define' in window) {
+define("discourse/theme-40/initializers/theme-field-95-common-html-script-1", ["exports", "discourse/lib/plugin-api"], function (_exports, _pluginApi) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = void 0;
+
+  var settings = require("discourse/lib/theme-settings-store").getObjectForTheme(40);
+
+  var themePrefix = function themePrefix(key) {
+    return "theme_translations.40.".concat(key);
+  };
+
+  var _default = {
+    name: "theme-field-95-common-html-script-1",
+    after: "inject-objects",
+    initialize: function initialize() {
+      (0, _pluginApi.withPluginApi)("0.11.0", function (api) {
+        // This should only be required if the gtm_container_id hasn't been set, but it is probably 
+        // best to include it to prevent errors if the gtm container id is ever removed from that setting.
+        window.dataLayer = window.dataLayer || [];
+        api.onAppEvent("page:bookmark-post-toggled", function (post) {
+          if (post && post.bookmarked) {
+            window.dataLayer.push({
+              'event': 'postBookmarked',
+              'postId': post.id
+            });
+          }
+        });
+        api.onAppEvent("post:created", function (post) {
+          if (post) {
+            window.dataLayer.push({
+              'event': 'postCreated',
+              'postId': post.id
+            });
+          }
+        });
+        api.onAppEvent("topic:created", function (post, composerModel) {
+          if (post) {
+            window.dataLayer.push({
+              'event': 'topicCreated',
+              'topicCategory': composerModel.get("category.name")
+            });
+          }
+        });
+        api.onAppEvent("page:like-toggled", function (post, likeAction) {
+          var topic = post.topic;
+
+          if (post && topic && likeAction && likeAction.acted) {
+            window.dataLayer.push({
+              'event': 'postLiked',
+              'postId': post.id
+            });
+          }
+        });
+      });
+    }
+  };
+  _exports.default = _default;
+});
+}
